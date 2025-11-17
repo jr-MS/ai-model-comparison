@@ -27,17 +27,29 @@ async function callOpenAI(
   config: ModelConfig,
   messages: Message[]
 ): Promise<APIResponse> {
+  const isNewerModel = config.modelName.includes('2024-11-20') || 
+                       config.modelName.includes('gpt-4o-mini-2024-07-18') ||
+                       config.modelName.includes('o1') ||
+                       config.modelName.includes('o3')
+
+  const requestBody: Record<string, unknown> = {
+    model: config.modelName,
+    messages: messages,
+  }
+
+  if (isNewerModel) {
+    requestBody.max_completion_tokens = 2000
+  } else {
+    requestBody.max_tokens = 2000
+  }
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${config.apiKey}`,
     },
-    body: JSON.stringify({
-      model: config.modelName,
-      messages: messages,
-      max_tokens: 2000,
-    }),
+    body: JSON.stringify(requestBody),
   })
 
   if (!response.ok) {
