@@ -74,12 +74,12 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                 )}
 
                 <div
-                  className={`flex flex-col max-w-[80%] ${
+                  className={`flex flex-col max-w-[80%] min-w-0 ${
                     message.role === 'user' ? 'items-end' : 'items-start'
                   }`}
                 >
                   <div
-                    className={`rounded-lg p-3 ${
+                    className={`rounded-lg p-3 max-w-full overflow-hidden ${
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : message.status === 'error'
@@ -107,7 +107,7 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                         </p>
                       </div>
                     ) : (
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed break-words overflow-wrap-anywhere">
                         {message.content}
                       </div>
                     )}
