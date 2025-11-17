@@ -80,16 +80,30 @@ async function callAzureOpenAI(
 
   const url = `${endpoint}/openai/deployments/${config.modelName}/chat/completions?api-version=2024-02-15-preview`
 
+  const isNewerModel = config.modelName.includes('2024-11-20') || 
+                       config.modelName.includes('gpt-4o-mini-2024-07-18') ||
+                       config.modelName.includes('o1') ||
+                       config.modelName.includes('o3') ||
+                       config.modelName.includes('gpt-4o') ||
+                       config.modelName.includes('gpt-5')
+
+  const requestBody: Record<string, unknown> = {
+    messages: messages,
+  }
+
+  if (isNewerModel) {
+    requestBody.max_completion_tokens = 2000
+  } else {
+    requestBody.max_tokens = 2000
+  }
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'api-key': config.apiKey,
     },
-    body: JSON.stringify({
-      messages: messages,
-      max_tokens: 2000,
-    }),
+    body: JSON.stringify(requestBody),
   })
 
   if (!response.ok) {
