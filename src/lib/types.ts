@@ -9,18 +9,24 @@ export interface ModelConfig {
   modelName: string
 }
 
-export interface ModelResponse {
-  modelId: string
-  status: 'idle' | 'loading' | 'success' | 'error'
-  content?: string
-  error?: string
-  responseTime?: number
-  tokenCount?: number
+export interface Message {
+  role: 'user' | 'assistant'
+  content: string
 }
 
-export interface PromptHistory {
+export interface ChatMessage {
   id: string
-  prompt: string
+  role: 'user' | 'assistant'
+  content: string
   timestamp: number
-  responses: ModelResponse[]
+  modelId?: string
+  responseTime?: number
+  tokenCount?: number
+  error?: string
+  status?: 'loading' | 'success' | 'error'
+}
+
+export interface Conversation {
+  modelId: string
+  messages: ChatMessage[]
 }

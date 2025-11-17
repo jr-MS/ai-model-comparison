@@ -1,4 +1,4 @@
-import { ModelConfig, ProviderType } from './types'
+import { ModelConfig, ProviderType, Message } from './types'
 
 interface APIResponse {
   content: string
@@ -7,17 +7,17 @@ interface APIResponse {
 
 export async function callModel(
   config: ModelConfig,
-  prompt: string
+  messages: Message[]
 ): Promise<APIResponse> {
   switch (config.provider) {
     case 'openai':
-      return callOpenAI(config, prompt)
+      return callOpenAI(config, messages)
     case 'azure':
-      return callAzureOpenAI(config, prompt)
+      return callAzureOpenAI(config, messages)
     case 'gemini':
-      return callGemini(config, prompt)
+      return callGemini(config, messages)
     case 'aws':
-      return callAWSBedrock(config, prompt)
+      return callAWSBedrock(config, messages)
     default:
       throw new Error(`Unknown provider: ${config.provider}`)
   }
@@ -25,7 +25,7 @@ export async function callModel(
 
 async function callOpenAI(
   config: ModelConfig,
-  prompt: string
+  messages: Message[]
 ): Promise<APIResponse> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -35,7 +35,7 @@ async function callOpenAI(
     },
     body: JSON.stringify({
       model: config.modelName,
-      messages: [{ role: 'user', content: prompt }],
+      messages: messages,
       max_tokens: 2000,
     }),
   })
@@ -56,7 +56,7 @@ async function callOpenAI(
 
 async function callAzureOpenAI(
   config: ModelConfig,
-  prompt: string
+  messages: Message[]
 ): Promise<APIResponse> {
   if (!config.endpoint) {
     throw new Error('Azure endpoint is required')
@@ -75,7 +75,7 @@ async function callAzureOpenAI(
       'api-key': config.apiKey,
     },
     body: JSON.stringify({
-      messages: [{ role: 'user', content: prompt }],
+      messages: messages,
       max_tokens: 2000,
     }),
   })
@@ -96,9 +96,14 @@ async function callAzureOpenAI(
 
 async function callGemini(
   config: ModelConfig,
-  prompt: string
+  messages: Message[]
 ): Promise<APIResponse> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.modelName}:generateContent?key=${config.apiKey}`
+
+  const contents = messages.map((msg) => ({
+    role: msg.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: msg.content }],
+  }))
 
   const response = await fetch(url, {
     method: 'POST',
@@ -106,11 +111,7 @@ async function callGemini(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      contents: [
-        {
-          parts: [{ text: prompt }],
-        },
-      ],
+      contents: contents,
     }),
   })
 
@@ -131,7 +132,7 @@ async function callGemini(
 
 async function callAWSBedrock(
   config: ModelConfig,
-  prompt: string
+  messages: Message[]
 ): Promise<APIResponse> {
   if (!config.endpoint) {
     throw new Error('AWS Bedrock endpoint is required')
@@ -150,12 +151,7 @@ async function callAWSBedrock(
       body: JSON.stringify({
         anthropic_version: 'bedrock-2023-05-31',
         max_tokens: 2000,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
+        messages: messages,
       }),
     }),
   })
