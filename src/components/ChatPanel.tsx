@@ -97,7 +97,7 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                           ? 'bg-gradient-to-br from-primary/95 via-accent/90 to-primary/85 text-white shadow-lg border border-white/20'
                           : message.status === 'error'
                           ? 'bg-destructive/10 border-2 border-destructive/20 shadow-sm'
-                          : 'bg-card border border-border shadow-md'
+                          : 'bg-gradient-to-br from-muted/50 to-muted/30 border border-border shadow-md'
                       }`}
                     >
                       {message.status === 'loading' ? (
