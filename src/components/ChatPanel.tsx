@@ -39,7 +39,7 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
   )
 
   return (
-    <Card className="flex flex-col h-[calc(100vh-200px)] shadow-xl border-2 hover:border-primary/20 transition-all overflow-hidden">
+    <Card className="flex flex-col h-[calc(100vh-200px)] shadow-xl border-2 hover:border-primary/20 transition-all overflow-hidden p-0">
       <div className="p-4 border-b flex items-center justify-between bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <Badge
@@ -92,9 +92,9 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                     }`}
                   >
                     <div
-                      className={`rounded-2xl p-4 w-full overflow-hidden transition-all ${
+                      className={`rounded-lg p-4 w-full overflow-hidden transition-all ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg'
+                          ? 'bg-primary text-primary-foreground shadow-md'
                           : message.status === 'error'
                           ? 'bg-destructive/10 border-2 border-destructive/20 shadow-sm'
                           : 'bg-gradient-to-br from-muted to-muted/50 shadow-md'
