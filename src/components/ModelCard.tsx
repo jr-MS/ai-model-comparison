@@ -13,18 +13,18 @@ interface ModelCardProps {
 
 export function ModelCard({ model, onEdit, onDelete }: ModelCardProps) {
   return (
-    <Card className="p-4">
+    <Card className="p-4 hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/30 bg-gradient-to-br from-card to-muted/20">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <Badge
               variant="outline"
-              className={`text-xs font-medium ${getProviderColor(model.provider)}`}
+              className={`text-xs font-semibold ${getProviderColor(model.provider)} shadow-sm`}
             >
               {getProviderName(model.provider)}
             </Badge>
           </div>
-          <h3 className="font-medium text-sm truncate mb-1">{model.name}</h3>
+          <h3 className="font-semibold text-sm truncate mb-1">{model.name}</h3>
           <p className="text-xs text-muted-foreground truncate">
             {model.modelName}
           </p>
@@ -34,7 +34,7 @@ export function ModelCard({ model, onEdit, onDelete }: ModelCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
             onClick={() => onEdit(model)}
           >
             <PencilSimple size={16} />
@@ -42,7 +42,7 @@ export function ModelCard({ model, onEdit, onDelete }: ModelCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-destructive hover:text-destructive"
+            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
             onClick={() => onDelete(model.id)}
           >
             <Trash size={16} />

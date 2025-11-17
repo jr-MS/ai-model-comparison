@@ -7,6 +7,7 @@ import { getProviderName, getProviderColor } from '@/lib/api'
 import { Copy, Check, Warning, User, Robot } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface ChatPanelProps {
   model: ModelConfig
@@ -38,17 +39,17 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
   )
 
   return (
-    <Card className="flex flex-col h-[calc(100vh-200px)]">
-      <div className="p-4 border-b flex items-center justify-between bg-card sticky top-0 z-10">
+    <Card className="flex flex-col h-[calc(100vh-200px)] shadow-xl border-2 hover:border-primary/20 transition-all overflow-hidden">
+      <div className="p-4 border-b flex items-center justify-between bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <Badge
             variant="outline"
-            className={`text-xs font-medium ${getProviderColor(model.provider)}`}
+            className={`text-xs font-semibold ${getProviderColor(model.provider)} shadow-sm`}
           >
             {getProviderName(model.provider)}
           </Badge>
           <div>
-            <h3 className="font-medium text-sm">{model.name}</h3>
+            <h3 className="font-semibold text-sm">{model.name}</h3>
             <p className="text-xs text-muted-foreground">{model.modelName}</p>
           </div>
         </div>
@@ -58,21 +59,29 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             {modelMessages.length === 0 ? (
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                <p className="text-sm">No messages yet. Start a conversation!</p>
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-muted/30 to-muted/10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                    <Robot size={32} className="text-primary/60" weight="duotone" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">No messages yet. Start a conversation!</p>
+                </div>
               </div>
             ) : (
-              modelMessages.map((message) => (
-                <div
+              modelMessages.map((message, index) => (
+                <motion.div
                   key={message.id}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                   className={`flex gap-3 ${
                     message.role === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   {message.role === 'assistant' && (
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Robot size={18} className="text-primary" />
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shadow-md">
+                        <Robot size={18} className="text-primary" weight="duotone" />
                       </div>
                     </div>
                   )}
@@ -83,30 +92,32 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                     }`}
                   >
                     <div
-                      className={`rounded-lg p-3 w-full overflow-hidden ${
+                      className={`rounded-2xl p-4 w-full overflow-hidden transition-all ${
                         message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg'
                           : message.status === 'error'
-                          ? 'bg-destructive/10 border border-destructive/20'
-                          : 'bg-muted'
+                          ? 'bg-destructive/10 border-2 border-destructive/20 shadow-sm'
+                          : 'bg-gradient-to-br from-muted to-muted/50 shadow-md'
                       }`}
                     >
                       {message.status === 'loading' ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                          <span className="text-sm text-muted-foreground">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <div className="w-5 h-5 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+                          </div>
+                          <span className="text-sm text-muted-foreground animate-pulse">
                             Generating response...
                           </span>
                         </div>
                       ) : message.status === 'error' ? (
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Warning size={16} className="text-destructive" />
-                            <span className="text-sm font-medium text-destructive">
+                            <Warning size={18} className="text-destructive" weight="fill" />
+                            <span className="text-sm font-semibold text-destructive">
                               Error
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground break-words">
+                          <p className="text-xs text-muted-foreground break-words leading-relaxed">
                             {message.error || 'An unknown error occurred'}
                           </p>
                         </div>
@@ -136,13 +147,13 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-5 w-5 ml-1"
+                            className="h-6 w-6 ml-1 hover:bg-primary/10 transition-colors"
                             onClick={() =>
                               handleCopy(message.id, message.content)
                             }
                           >
                             {copiedId === message.id ? (
-                              <Check size={12} />
+                              <Check size={12} className="text-primary" weight="bold" />
                             ) : (
                               <Copy size={12} />
                             )}
@@ -153,12 +164,12 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
 
                   {message.role === 'user' && (
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                        <User size={18} className="text-accent-foreground" />
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/80 to-accent shadow-md flex items-center justify-center">
+                        <User size={18} className="text-accent-foreground" weight="duotone" />
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))
             )}
           </div>

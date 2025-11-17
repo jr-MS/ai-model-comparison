@@ -240,15 +240,15 @@ function App() {
   const hasModels = modelList.length > 0
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Toaster />
 
       <div className="flex h-screen relative">
-        <aside className={`border-r bg-card flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden relative`}>
-          <div className="p-6 border-b flex items-center justify-between">
+        <aside className={`border-r bg-card/80 backdrop-blur-xl flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden relative shadow-xl`}>
+          <div className="p-6 border-b bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                AI Model Comparator
+              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                AI Comparator
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Multi-turn conversations across providers
@@ -258,6 +258,7 @@ function App() {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarCollapsed((prev) => !prev)}
+              className="hover:bg-primary/10"
             >
               <CaretLeft size={20} />
             </Button>
@@ -285,11 +286,11 @@ function App() {
             </div>
           </ScrollArea>
 
-          <div className="p-4 border-t space-y-2">
+          <div className="p-4 border-t space-y-2 bg-gradient-to-t from-muted/30 to-transparent">
             {hasModels && (
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all"
                 onClick={handleClearChat}
               >
                 <Trash size={16} className="mr-2" />
@@ -297,7 +298,7 @@ function App() {
               </Button>
             )}
             <Button
-              className="w-full"
+              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-lg"
               onClick={() => {
                 setEditingModel(undefined)
                 setDialogOpen(true)
@@ -313,7 +314,7 @@ function App() {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 left-0 z-50 bg-card border border-border shadow-lg rounded-r-md rounded-l-none"
+            className="absolute top-4 left-0 z-50 bg-card/80 backdrop-blur-xl border border-border shadow-2xl rounded-r-xl rounded-l-none hover:bg-primary/10 transition-all"
             onClick={() => setSidebarCollapsed(false)}
           >
             <CaretRight size={20} />
@@ -325,11 +326,14 @@ function App() {
           <div className="flex-1 overflow-hidden">
             {!hasModels ? (
               <div className="flex items-center justify-center h-full">
-                <div className="text-center max-w-md">
-                  <h2 className="text-lg font-semibold mb-2">
-                    Welcome to AI Model Comparator
+                <div className="text-center max-w-md p-8 rounded-2xl bg-card/50 backdrop-blur-sm border-2 shadow-2xl">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                    <Plus size={40} className="text-primary" weight="bold" />
+                  </div>
+                  <h2 className="text-xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Welcome to AI Comparator
                   </h2>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                     Add AI models from different providers to start comparing
                     their responses in multi-turn conversations. Your API
                     credentials are stored locally.
@@ -340,6 +344,7 @@ function App() {
                       setEditingModel(undefined)
                       setDialogOpen(true)
                     }}
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-lg"
                   >
                     <Plus size={18} className="mr-2" />
                     Add Your First Model
@@ -379,14 +384,14 @@ function App() {
             )}
           </div>
 
-          <div className="p-4 border-t bg-card">
+          <div className="p-4 border-t bg-card/80 backdrop-blur-xl shadow-2xl">
             <div className="max-w-4xl mx-auto space-y-3">
               <Textarea
                 placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="min-h-[80px] resize-none"
+                className="min-h-[80px] resize-none border-2 focus:border-primary/50 transition-colors shadow-sm"
                 disabled={isRunning || !hasModels}
               />
               <div className="flex justify-end">
@@ -394,6 +399,7 @@ function App() {
                   onClick={handleSendToAll}
                   disabled={!prompt.trim() || isRunning || !hasModels}
                   size="lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-lg"
                 >
                   <PaperPlaneRight size={18} className="mr-2" />
                   {isRunning ? 'Sending...' : 'Send to All Models'}

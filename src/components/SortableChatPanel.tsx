@@ -21,11 +21,19 @@ export function SortableChatPanel({ model, messages }: SortableChatPanelProps) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.6 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    scale: isDragging ? '1.02' : '1',
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      {...attributes} 
+      {...listeners}
+      className={`transition-all ${isDragging ? 'z-50 shadow-2xl' : ''}`}
+    >
       <ChatPanel model={model} messages={messages} />
     </div>
   )
