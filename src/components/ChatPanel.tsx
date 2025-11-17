@@ -94,7 +94,7 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                     <div
                       className={`rounded-lg p-4 w-full overflow-hidden transition-all ${
                         message.role === 'user'
-                          ? 'bg-primary text-primary-foreground shadow-md'
+                          ? 'bg-gradient-to-br from-primary/8 via-accent/6 to-primary/5 text-foreground shadow-sm border border-primary/10'
                           : message.status === 'error'
                           ? 'bg-destructive/10 border-2 border-destructive/20 shadow-sm'
                           : 'bg-gradient-to-br from-muted to-muted/50 shadow-md'
