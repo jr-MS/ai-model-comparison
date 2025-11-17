@@ -8,7 +8,7 @@ import { ChatPanel } from './components/ChatPanel'
 import { Button } from './components/ui/button'
 import { Textarea } from './components/ui/textarea'
 import { ScrollArea } from './components/ui/scroll-area'
-import { Plus, PaperPlaneRight, Trash } from '@phosphor-icons/react'
+import { Plus, PaperPlaneRight, Trash, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Toaster } from './components/ui/sonner'
 
@@ -18,6 +18,7 @@ function App() {
     'conversations',
     []
   )
+  const [sidebarCollapsed, setSidebarCollapsed] = useKV<boolean>('sidebar-collapsed', false)
   const [prompt, setPrompt] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingModel, setEditingModel] = useState<ModelConfig | undefined>()
@@ -221,7 +222,7 @@ function App() {
       <Toaster />
 
       <div className="flex h-screen">
-        <aside className="w-80 border-r bg-card flex flex-col">
+        <aside className={`border-r bg-card flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden`}>
           <div className="p-6 border-b">
             <h1 className="text-2xl font-bold tracking-tight">
               AI Model Comparator
@@ -277,7 +278,16 @@ function App() {
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 left-4 z-10"
+            onClick={() => setSidebarCollapsed((prev) => !prev)}
+          >
+            {sidebarCollapsed ? <CaretRight size={20} /> : <CaretLeft size={20} />}
+          </Button>
+
           <div className="flex-1 overflow-hidden">
             {!hasModels ? (
               <div className="flex items-center justify-center h-full">
@@ -305,7 +315,7 @@ function App() {
             ) : (
               <ScrollArea className="h-full">
                 <div className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className={`grid gap-4 ${sidebarCollapsed ? 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'}`}>
                     {modelList.map((model) => (
                       <ChatPanel
                         key={model.id}
