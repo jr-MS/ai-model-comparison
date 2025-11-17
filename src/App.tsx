@@ -4,13 +4,15 @@ import { ModelConfig, ChatMessage, Conversation, Message } from './lib/types'
 import { callModel } from './lib/api'
 import { ModelConfigDialog } from './components/ModelConfigDialog'
 import { ModelCard } from './components/ModelCard'
-import { ChatPanel } from './components/ChatPanel'
+import { SortableChatPanel } from './components/SortableChatPanel'
 import { Button } from './components/ui/button'
 import { Textarea } from './components/ui/textarea'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Plus, PaperPlaneRight, Trash, CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Toaster } from './components/ui/sonner'
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable'
 
 function App() {
   const [models, setModels] = useKV<ModelConfig[]>('ai-models', [])
@@ -26,6 +28,26 @@ function App() {
 
   const modelList = models || []
   const conversationList = conversations || []
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setModels((currentModels) => {
+        const safeModels = currentModels || []
+        const oldIndex = safeModels.findIndex((m) => m.id === active.id)
+        const newIndex = safeModels.findIndex((m) => m.id === over.id)
+        return arrayMove(safeModels, oldIndex, newIndex)
+      })
+    }
+  }
 
   const handleSaveModel = (config: ModelConfig) => {
     setModels((currentModels) => {
@@ -223,13 +245,22 @@ function App() {
 
       <div className="flex h-screen">
         <aside className={`border-r bg-card flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden`}>
-          <div className="p-6 border-b">
-            <h1 className="text-2xl font-bold tracking-tight">
-              AI Model Comparator
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Multi-turn conversations across providers
-            </p>
+          <div className="p-6 border-b flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">
+                AI Model Comparator
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Multi-turn conversations across providers
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarCollapsed((prev) => !prev)}
+            >
+              <CaretLeft size={20} />
+            </Button>
           </div>
 
           <ScrollArea className="flex-1">
@@ -279,14 +310,16 @@ function App() {
         </aside>
 
         <main className="flex-1 flex flex-col relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 left-4 z-10"
-            onClick={() => setSidebarCollapsed((prev) => !prev)}
-          >
-            {sidebarCollapsed ? <CaretRight size={20} /> : <CaretLeft size={20} />}
-          </Button>
+          {sidebarCollapsed && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 left-4 z-10"
+              onClick={() => setSidebarCollapsed(false)}
+            >
+              <CaretRight size={20} />
+            </Button>
+          )}
 
           <div className="flex-1 overflow-hidden">
             {!hasModels ? (
@@ -315,15 +348,31 @@ function App() {
             ) : (
               <ScrollArea className="h-full">
                 <div className="p-6">
-                  <div className={`grid gap-4 ${sidebarCollapsed ? 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'}`}>
-                    {modelList.map((model) => (
-                      <ChatPanel
-                        key={model.id}
-                        model={model}
-                        messages={getAllMessages(model.id)}
-                      />
-                    ))}
-                  </div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={modelList.map((m) => m.id)}
+                      strategy={rectSortingStrategy}
+                    >
+                      <div className={`grid gap-4 ${
+                        modelList.length === 1 ? 'grid-cols-1' :
+                        modelList.length === 2 ? 'grid-cols-1 lg:grid-cols-2' :
+                        modelList.length === 3 ? 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3' :
+                        'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                      }`}>
+                        {modelList.map((model) => (
+                          <SortableChatPanel
+                            key={model.id}
+                            model={model}
+                            messages={getAllMessages(model.id)}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
                 </div>
               </ScrollArea>
             )}
