@@ -92,12 +92,12 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
                     }`}
                   >
                     <div
-                      className={`rounded-lg p-4 w-full overflow-hidden transition-all ${
+                      className={`rounded-2xl p-4 w-full overflow-hidden transition-all ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-br from-primary/8 via-accent/6 to-primary/5 text-foreground shadow-sm border border-primary/10'
+                          ? 'bg-gradient-to-br from-primary/95 via-accent/90 to-primary/85 text-white shadow-lg border border-white/20'
                           : message.status === 'error'
                           ? 'bg-destructive/10 border-2 border-destructive/20 shadow-sm'
-                          : 'bg-gradient-to-br from-muted to-muted/50 shadow-md'
+                          : 'bg-card border border-border shadow-md'
                       }`}
                     >
                       {message.status === 'loading' ? (
@@ -164,8 +164,8 @@ export function ChatPanel({ model, messages }: ChatPanelProps) {
 
                   {message.role === 'user' && (
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/80 to-accent shadow-md flex items-center justify-center">
-                        <User size={18} className="text-accent-foreground" weight="duotone" />
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent shadow-md flex items-center justify-center">
+                        <User size={18} className="text-white" weight="duotone" />
                       </div>
                     </div>
                   )}
