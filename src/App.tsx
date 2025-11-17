@@ -243,8 +243,8 @@ function App() {
     <div className="min-h-screen bg-background">
       <Toaster />
 
-      <div className="flex h-screen">
-        <aside className={`border-r bg-card flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden`}>
+      <div className="flex h-screen relative">
+        <aside className={`border-r bg-card flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-80'} overflow-hidden relative`}>
           <div className="p-6 border-b flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">
@@ -309,17 +309,18 @@ function App() {
           </div>
         </aside>
 
+        {sidebarCollapsed && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 left-0 z-50 bg-card border border-border shadow-lg rounded-r-md rounded-l-none"
+            onClick={() => setSidebarCollapsed(false)}
+          >
+            <CaretRight size={20} />
+          </Button>
+        )}
+
         <main className="flex-1 flex flex-col relative">
-          {sidebarCollapsed && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 left-4 z-10"
-              onClick={() => setSidebarCollapsed(false)}
-            >
-              <CaretRight size={20} />
-            </Button>
-          )}
 
           <div className="flex-1 overflow-hidden">
             {!hasModels ? (
